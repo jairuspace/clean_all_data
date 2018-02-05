@@ -12,17 +12,13 @@ def clean_all_data(training_data, predicting_data, output_file, predict_file, dr
 
     dataframe = pd.concat([train_frame,predict_frame])
     dataframe = dataframe.drop(drop_cols, axis=1)
-    print(dataframe.head())
 
     #Clean Data
     coded_frame = pd.DataFrame()
     i = 0
     for column in dataframe:
-        # print(dataframe[column].dtype)
-        if dataframe.columns.values[i] == id_col:
-            # print(dataframe['lid'])
-            print(i)
-            coded_frame[column] = dataframe[column]
+        if str(dataframe.columns.values[i]) == str(id_col):
+            coded_frame[column] = list(dataframe[column])
             i += 1
             continue
         else:
@@ -30,12 +26,12 @@ def clean_all_data(training_data, predicting_data, output_file, predict_file, dr
                 dataframe[column] = dataframe[column].fillna('notfound')
             else:
                 dataframe[column] = dataframe[column].fillna(0)
+            # i += 1
             le = LabelEncoder()
             le.fit(dataframe[column])
             transformed = le.transform(dataframe[column])
             coded_frame[column] = transformed
-
-    print(coded_frame.head())
+        i += 1
 
     train_frame = coded_frame[:train_len]
     predict_frame = coded_frame[predict_len:]
@@ -48,8 +44,6 @@ def clean_all_data(training_data, predicting_data, output_file, predict_file, dr
         # Downsample to equal proportions
         complete = dataframe[dataframe[response_var] == 1]
         incomplete = dataframe[dataframe[response_var] == 0]
-        print (len(complete))
-        print (len(incomplete))
         if len(complete) < len(incomplete):
             incomplete = incomplete.sample(len(complete))
         elif len(complete) > len(incomplete):
